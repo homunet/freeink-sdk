@@ -1004,6 +1004,28 @@ void FreeInkDisplay::writeGrayscalePlaneStrip(GrayPlane plane, const uint8_t* ro
                                     rows, yStart, numRows);
 }
 
+bool FreeInkDisplay::supportsGrayscaleWindow() const { return _driver && _driver->supportsGrayscaleWindow(); }
+
+void FreeInkDisplay::declareGrayscaleWindowsComplete() {
+  if (_grayscaleMode == GrayscaleMode::Absolute && !_grayPassFailed) _grayRows[0] = _grayRows[1] = getDisplayHeight();
+}
+
+bool FreeInkDisplay::writeGrayscalePlaneWindow(GrayPlane plane, const uint8_t* data, uint16_t x, uint16_t y, uint16_t w,
+                                               uint16_t h) {
+  if (_inverted || !_driver || !_driver->supportsGrayscaleWindow()) return false;
+  if (_grayPassFailed || (_grayscaleMode != GrayscaleMode::Overlay && _grayscaleMode != GrayscaleMode::Absolute)) {
+    return false;
+  }
+  if (!data || w == 0 || h == 0 || (x & 7) || (w & 7) || x + w > getDisplayWidth() || y + h > getDisplayHeight()) {
+    return false;
+  }
+  DisplayPmLock pmLock;
+  syncPendingAsync();  // controller RAM writes must not race a pending B/W waveform
+  _driver->writeGrayscalePlaneWindow(_bus, plane == GRAY_PLANE_LSB ? freeink::GrayPlane::Lsb : freeink::GrayPlane::Msb,
+                                     data, x, y, w, h);
+  return true;
+}
+
 bool FreeInkDisplay::supportsBusyGrayscaleStaging() const {
   return grayscaleCapabilities().stagingWhileBusy;
 }

@@ -135,6 +135,13 @@ class FreeInkDisplay {
   void copyGrayscaleMsbBuffers(const uint8_t* msbBuffer);
   enum GrayPlane { GRAY_PLANE_LSB, GRAY_PLANE_MSB };
   void writeGrayscalePlaneStrip(GrayPlane plane, const uint8_t* rows, uint16_t yStart, uint16_t numRows);
+  // Overlay-mode only: write h rows of w / 8 bytes into the byte-aligned rectangle (x, y, w, h)
+  // of a gray plane. Returns false (nothing written) when unsupported or the arguments are invalid.
+  bool supportsGrayscaleWindow() const;
+  // Absolute mode: window writes are not row-contiguous, so the caller states when the windows
+  // written tile the whole panel (marks both planes complete for displayGrayBuffer()).
+  void declareGrayscaleWindowsComplete();
+  bool writeGrayscalePlaneWindow(GrayPlane plane, const uint8_t* data, uint16_t x, uint16_t y, uint16_t w, uint16_t h);
   // Current mode availability, including output inversion and base readiness.
   // A query does not alter the pending refresh or the plane encoding.
   GrayscaleCapabilities grayscaleCapabilities(GrayscaleMode mode = GrayscaleMode::Overlay) const;

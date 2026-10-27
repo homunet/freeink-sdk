@@ -812,6 +812,16 @@ void Ssd1677Driver::writeGrayscalePlaneStrip(EpdBus& bus, GrayPlane plane, const
   writeGrayRam(bus, ramCmd, rows, len);
 }
 
+void Ssd1677Driver::writeGrayscalePlaneWindow(EpdBus& bus, GrayPlane plane, const uint8_t* data, uint16_t x,
+                                              uint16_t y, uint16_t w, uint16_t h) {
+  if (!data || w == 0 || h == 0 || (x & 7) || (w & 7)) return;
+  const uint32_t len = static_cast<uint32_t>(w / 8) * h;
+  if (len > 0xFFFF) return;  // EpdBus::data length is 16-bit
+  const uint8_t ramCmd = (plane == GrayPlane::Lsb) ? CMD_WRITE_RAM_BW : CMD_WRITE_RAM_RED;
+  setRamArea(bus, x, y, w, h);
+  writeGrayRam(bus, ramCmd, data, static_cast<uint16_t>(len));
+}
+
 void Ssd1677Driver::displayGray(EpdBus& bus, const uint8_t* fb, bool turnOff, const unsigned char* lut,
                                 bool factoryMode) {
   if (!_cfg.overlayGrayscale && !_cfg.absoluteGrayscale && lut == nullptr) {

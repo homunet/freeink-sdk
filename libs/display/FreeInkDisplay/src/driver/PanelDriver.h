@@ -161,6 +161,19 @@ class PanelDriver {
   // B/W waveform is BUSY. Drivers returning true must not touch SPI in either
   // writeGrayscalePlaneStrip() or prepareGrayscaleTarget().
   virtual bool supportsBusyGrayscaleStaging() const { return grayscaleCapabilities().stagingWhileBusy; }
+  // Optional: write a byte-aligned rectangle of an overlay gray plane (h rows of w / 8 bytes).
+  // Drivers that implement it return true from supportsGrayscaleWindow().
+  virtual bool supportsGrayscaleWindow() const { return false; }
+  virtual void writeGrayscalePlaneWindow(EpdBus& bus, GrayPlane plane, const uint8_t* data, uint16_t x, uint16_t y,
+                                         uint16_t w, uint16_t h) {
+    (void)bus;
+    (void)plane;
+    (void)data;
+    (void)x;
+    (void)y;
+    (void)w;
+    (void)h;
+  }
   virtual void writeGrayscalePlaneStrip(EpdBus& bus, GrayPlane plane, const uint8_t* rows, uint16_t yStart,
                                         uint16_t numRows) {
     (void)bus;
