@@ -1,5 +1,19 @@
 # FreeInk SDK
 
+> **Unofficial fork** of [Free-Ink/freeink-sdk](https://github.com/Free-Ink/freeink-sdk), made for
+> [crosspoint-reader-jp](https://github.com/homunet/crosspoint-reader-jp) (Japanese reading on the Xteink X4).
+> Not affiliated with FreeInk. No warranty; use at your own risk.
+>
+> **本家との違い / Differences from upstream** (2 commits on top of upstream commit `f9cc1be`)
+> - [**Full list of changes (diff against upstream)**](https://github.com/Free-Ink/freeink-sdk/compare/f9cc1beda45f4d2d3dade69fc444165727424f53...homunet:freeink-sdk:jp/window-gray)
+> - `feat(display)`: write a byte-aligned window of an overlay or absolute gray plane (new `writeGrayscalePlaneWindow()`;
+>   SSD1677 only, other drivers are unchanged).
+> - `feat(ssd1677)`: the factory 4-level waveform runs with frame-rate byte `0x88` instead of `0x22`
+>   (about 0.34 s instead of 1.08 s on an Xteink X4; check contrast and ghosting before changing it).
+> - 上のリンクが、本家との差分の全部です(2 コミット・5 ファイル)。日本語の説明は
+>   [crosspoint-reader-jp の README.ja.md](https://github.com/homunet/crosspoint-reader-jp/blob/jp/2.0.0rc/README.ja.md) を参照してください。
+> - GitHub の「N commits behind」の表示は、本家がその後に進めた開発を示すだけです。この分岐は、本家の古い時点(`f9cc1be`)から作っています。
+
 [![Sponsor on Open Collective](https://img.shields.io/badge/sponsor-Open%20Collective-7FADF2?logo=opencollective&logoColor=white)](https://opencollective.com/freeink)
 
 A hardware-independent SDK for building e-paper reader firmware. FreeInk
