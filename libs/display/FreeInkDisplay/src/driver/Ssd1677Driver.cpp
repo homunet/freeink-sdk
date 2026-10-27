@@ -26,6 +26,8 @@ constexpr uint8_t CMD_SET_RAM_X_COUNTER = 0x4E;
 constexpr uint8_t CMD_SET_RAM_Y_COUNTER = 0x4F;
 constexpr uint8_t CMD_WRITE_RAM_BW = 0x24;
 constexpr uint8_t CMD_WRITE_RAM_RED = 0x26;
+// Frame-rate byte written into the factory 4-level LUT (bytes 100..104); the stock value is 0x22.
+constexpr uint8_t kFactoryGrayFrameRate = 0x88;
 constexpr uint8_t CMD_AUTO_WRITE_BW_RAM = 0x46;
 constexpr uint8_t CMD_AUTO_WRITE_RED_RAM = 0x47;
 constexpr uint8_t CMD_DISPLAY_UPDATE_CTRL1 = 0x21;
@@ -838,6 +840,16 @@ void Ssd1677Driver::displayGray(EpdBus& bus, const uint8_t* fb, bool turnOff, co
   if (selectedLut == nullptr) {
     selectedLut = factoryMode ? (_cfg.factoryGrayLut ? _cfg.factoryGrayLut : lut_factory_quality)
                               : _cfg.grayLut;
+  }
+
+  // The factory 4-level waveform ships at frame-rate byte 0x22 (about 21 ms per frame, 50 frames,
+  // 1.08 s). A larger code shortens every frame (0x88: about 6.7 ms, 0.34 s); the drive pulses get
+  // shorter with it, so keep this value only after checking contrast and ghosting on the panel.
+  static uint8_t factoryLut[110];
+  if (factoryMode && lut == nullptr) {
+    memcpy_P(factoryLut, selectedLut, sizeof(factoryLut));
+    for (int i = 100; i < 105; i++) factoryLut[i] = kFactoryGrayFrameRate;
+    selectedLut = factoryLut;
   }
   setCustomLut(bus, true, selectedLut);
 
